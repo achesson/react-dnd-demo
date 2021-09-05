@@ -1,54 +1,79 @@
 import React, { useState } from "react";
-import Picture from "./Picture";
+import DragBlock from "./DragBlock";
 import { useDrop } from "react-dnd";
 import "../App.css";
+import DropZone from "./DropZone"
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
-const PictureList = [
+
+const BlockList = [
+
   {
     id: 1,
-    url:
-      "https://yt3.ggpht.com/ytc/AAUvwnjOQiXUsXYMs8lwrd4litEEqXry1-atqJavJJ09=s900-c-k-c0x00ffffff-no-rj",
+    description: "Meeting",
+    ranking: 3
   },
   {
     id: 2,
-    url:
-      "https://media-exp1.licdn.com/dms/image/C4D03AQExheo0sff_yQ/profile-displayphoto-shrink_200_200/0/1590072898568?e=1630540800&v=beta&t=_W-gWZewSBYQ-UAjpGvR8h_8Vvo202IHQQissbK2aKc",
+    description: "Dance",
+    ranking: 2
   },
   {
     id: 3,
-    url:
-      "https://yt3.ggpht.com/pe57RF1GZibOWeZ9GwRWbjnLDCK2EEAeQ3u4iMAFNeaz-PN9uSsg1p2p32TZUedNnrUhKfoOuMM=s900-c-k-c0x00ffffff-no-rj",
+    description: "Hoover",
+    ranking: 1
   },
 ];
+const zones = {"zone-1": 1, "zone-2": 2, "zone-3": 3}
 
 function DragDrop() {
-  const [board, setBoard] = useState([]);
+  const [blocks, setBlocks] = useState(BlockList);
 
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: "image",
-    drop: (item) => addImageToBoard(item.id),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-    }),
-  }));
+//   const [{ isOver }, drop] = useDrop(() => ({
+//     accept: "button",
+//     drop: (item) => addBlockToBoard(item.id),
+//     collect: (monitor) => ({
+//       isOver: !!monitor.isOver(),
+//     }),
+//   }));
 
-  const addImageToBoard = (id) => {
-    const pictureList = PictureList.filter((picture) => id === picture.id);
-    setBoard((board) => [...board, pictureList[0]]);
-  };
+const moveBlock = (blockId, dropZoneId) => {
+  
+  //get the id of the block that is dragging
+  const draggedBlock = blocks.filter((block) => blockId === block.id);
+  //determine destination of dragged block
+  console.log("moveblock blockId", blockId);
+  console.log("dropId Id", dropZoneId);
+  //change ranking of block
+  let newRanking = zones[dropZoneId];
+  draggedBlock[0].ranking = newRanking;
+  console.log(draggedBlock);
+  //copy state
+  let newBlocks = [...blocks];
+  //replace old block with new block
+  let index = blocks.map(function(e) { return e.id; }).indexOf(blockId);
+  console.log(index);
+  newBlocks.splice(index, 1, draggedBlock[0]);
+  setBlocks(blocks => newBlocks);
+  
+
+}
   return (
-    <>
-      <div className="Pictures">
-        {PictureList.map((picture) => {
-          return <Picture url={picture.url} id={picture.id} />;
+    <DndProvider backend={HTML5Backend}>
+      <div className="Blocks">
+        {blocks.map((block) => {
+          return <DragBlock description={block.description} id={block.id} ranking={block.ranking} />;
         })}
       </div>
-      <div className="Board" ref={drop}>
-        {board.map((picture) => {
-          return <Picture url={picture.url} id={picture.id} />;
-        })}
+      <div className="grid" >
+      <DropZone moveBlockCb={(blockId, dropZoneId) => moveBlock(blockId, dropZoneId)} blocks={blocks.filter(block => block.ranking===3)} id="zone-3" title={"High"}/>
+      <DropZone moveBlockCb={(blockId, dropZoneId) => moveBlock(blockId, dropZoneId)}blocks={blocks.filter(block => block.ranking===2)}  id="zone-2" title={"Medium"}/>
+      <DropZone moveBlockCb={(blockId, dropZoneId) => moveBlock(blockId, dropZoneId)} blocks={blocks.filter(block => block.ranking===1)}  id="zone-1" title={"Low"}/>
+   
       </div>
-    </>
+     
+      </DndProvider>
   );
 }
 
