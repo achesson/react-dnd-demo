@@ -4,20 +4,6 @@
   height: 100vh;
 }
 
-.Blocks {
-  margin: 10px;
-}
-img {
-  margin: 5px;
-}
 
-.Board {
-  width: 300px;
-  height: 500px;
-  border: 2px solid black;
-}
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
+

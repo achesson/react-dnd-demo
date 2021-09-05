@@ -2,31 +2,39 @@
 import React from "react";
 import { useDrag } from "react-dnd";
 
-function DragBlock({ id, description, ranking}) {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "button",
-    item: { id: id },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
+// function DragBlock({ id, description, ranking}) {
+//   const [{ isDragging }, dragRef] = useDrag(() => ({
+//     type: "button",
+//     item: { id: id },
+//     collect: (monitor) => ({
+//       isDragging: !!monitor.isDragging(),
+//     }),
+//   }));
+
+
+  function DragBlock(props) {
+    const [collected, dragRef] = useDrag(() => ({
+        type: "box",
+
+        // This is called when drag starts
+        item: () => {
+            let row = document.getElementById(props.id).parentElement;
+            // Return IDs of box and col where drag started
+            return { id: props.id, startDragRowId: row.id };
+        }
+    }));
   return (
  
-    <div>
+    
    
     <button 
-    
-    ref={drag} 
-    className="btn btn-dark"
-    style={{ border: isDragging ? "5px solid pink" : "0px",
-              backgroundColor: (ranking===3)  ? "slateblue": 
-                                (ranking===2) ? "orange": "darkseagreen"
-  
-  }}
+    className={`DragBlock${props.rowId}`}
+    id={props.id}
+    ref={dragRef} 
      >
-    {description} {" "}⬇️
+    {props.children} {" "}⬇️
     </button>
-    </div>
+    
   );
 }
 
